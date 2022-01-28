@@ -2,6 +2,7 @@ from pickle import FALSE
 from english_words import english_words_lower_alpha_set
 import copy
 from tqdm import tqdm
+import time
 
 
 def num_of(a,word):
@@ -53,6 +54,7 @@ def go(known_place,known,not_in, not_there, five_letter_words):
     best_word = "BADBAD"
     best_word_score = 100000000000
 
+
     words_copy = copy.deepcopy(five_letter_words)
     for guess in (words_copy):
         if is_possible(guess, known_place, known,not_in, not_there):
@@ -76,14 +78,17 @@ temp = f.readlines()
 f.close()
 five_letter_words = [word.strip() for word in temp]
 
+#print(is_possible("perky",[0,0,0,0,0],["e","r"],["s","a","o"],[[],[],[],[],[]]))
+
 print("starting")
 
 
 print("Enter the word \"soare\"")
 done_words = ["soare"]
 not_there = [[],[],[],[],[]]
+known_place_list = [0,0,0,0,0]
 while True:
-    print(" ")
+    
     known_place = input("Enter the letters that you know the place of. Use a 0 if you do not know: ")
     known = input("Enter the letters that you know in any order: ")
     not_in = input("Enter the letters that are not in in any order: ")
@@ -104,15 +109,22 @@ while True:
     for x in not_in:
         not_in_list.append(x)
 
+    recent_word = done_words[-1]
+    lcv = 0
+    for x in recent_word:
+        if known_place_list[lcv] == 0:
+            not_there[lcv].append(recent_word[lcv])
+        lcv += 1
+    print("not there", not_there)
+    time.sleep(2)
+
     BW = go(known_place_list,known_list,not_in_list, not_there,five_letter_words)
     done_words.append(BW)
     print("THE BEST WORD TO USE IS: ",BW)
-    lcv = 0
-    for x in known_place_list:
-        if x == 0:
-            for y in done_words:
-                not_there[lcv].append(y[lcv])
-        lcv += 1
     
     
-    print(not_there)
+
+    
+    
+    
+    

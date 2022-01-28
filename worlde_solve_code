@@ -2,6 +2,8 @@ from pickle import FALSE
 from english_words import english_words_lower_alpha_set
 import copy
 import json
+from time import sleep
+from tqdm import tqdm
 
 
 def num_of(a,word):
@@ -80,7 +82,6 @@ def go(known_place,known,not_in, not_there):
             if temp_counter < best_word_score:
                 best_word_score = temp_counter
                 best_word = guess
-                print(best_word, best_word_score)
     return best_word
 
 
@@ -109,12 +110,15 @@ while True:
     for x in not_in:
         not_in_list.append(x)
 
+    BW = go(known_place_list,known_list,not_in_list, not_there)
+    done_words.append(BW)
+    print(BW)
     lcv = 0
     for x in known_place_list:
         if x == 0:
             for y in done_words:
                 not_there[lcv].append(y[lcv])
         lcv += 1
+    
+    
     print(not_there)
-    BW = go(known_place_list,known_list,not_in_list, not_there)
-    done_words.append(BW)

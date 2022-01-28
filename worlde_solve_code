@@ -62,6 +62,9 @@ def new_info(guess, answer,known_place, known, not_in, temp_not_there):
              
         if guess[lcv] not in answer:
             not_in.append(guess[lcv])
+        
+        if known_place[lcv] == 0:
+            temp_not_there[lcv] = guess[lcv]
         lcv += 1
 
 
@@ -81,7 +84,7 @@ def go(known_place,known,not_in, not_there, five_letter_words):
                     temp_not_in = copy.deepcopy(not_in)
                     temp_not_there = copy.deepcopy(not_there)
                     new_info(guess, pot_ans, temp_known_place, temp_known,temp_not_in, temp_not_there)
-                    temp_counter += possible_option_counter(temp_known_place, temp_known, five_letter_words,temp_not_in,not_there)
+                    temp_counter += possible_option_counter(temp_known_place, temp_known, five_letter_words,temp_not_in,temp_not_there)
                     if temp_counter > best_word_score:
                         temp_counter += 100000
                         break

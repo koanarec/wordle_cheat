@@ -73,7 +73,7 @@ def go(known_place,known,not_in, not_there, five_letter_words):
                 best_word = guess
     return best_word
 
-f = open('wordle-allowed-guesses.txt','r')
+f = open('wordlewords.txt','r')
 temp = f.readlines()
 f.close()
 five_letter_words = [word.strip() for word in temp]

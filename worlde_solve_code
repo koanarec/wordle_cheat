@@ -2,7 +2,7 @@ from pickle import FALSE
 from english_words import english_words_lower_alpha_set
 import copy
 import json
-from time import sleep
+import time
 from tqdm import tqdm
 
 
@@ -14,7 +14,6 @@ def num_of(a,word):
     return total
 
 def is_possible(guess, known_place, known, not_in, not_there):
-    done = []
     for x in range(0,5):
         if guess[x] != known_place[x] and known_place[x] != 0:
             return False
@@ -55,23 +54,16 @@ def new_info(guess, answer,known_place, known, not_in):
         lcv += 1
 
 
-def go(known_place,known,not_in, not_there):
+def go(known_place,known,not_in, not_there, five_letter_words):
     best_word = "BADBAD"
     best_word_score = 10 **100
 
-    five_letter_words = []
-    for x in english_words_lower_alpha_set:
-        if len(x) == 5:
-            five_letter_words.append(x)
-    bad = "alice ghent caine carib"
-    bad = bad.split()
-    for x in bad:
-        five_letter_words.remove(x)
-    COPYfive_letter_words = copy.deepcopy(five_letter_words)
-    for guess in tqdm(five_letter_words):
+    words_copy = copy.deepcopy(five_letter_words)
+    for guess in (words_copy):
         if is_possible(guess, known_place, known,not_in, not_there):
             temp_counter = 0
-            for pot_ans in COPYfive_letter_words:
+            for pot_ans in tqdm(five_letter_words, desc="Currently checking how good \"{}\" is".format(guess)):
+                
                 temp_known_place = copy.deepcopy(known_place)
                 temp_known = copy.deepcopy(known)
                 temp_not_in = copy.deepcopy(not_in)
@@ -84,6 +76,12 @@ def go(known_place,known,not_in, not_there):
                 best_word = guess
     return best_word
 
+f = open('wordle-allowed-guesses.txt','r')
+temp = f.readlines()
+f.close()
+five_letter_words = [word.strip() for word in temp]
+
+print("starting")
 
 
 print("Enter the word \"soare\"")
@@ -94,6 +92,7 @@ while True:
     known_place = input("Enter the letters that you know the place of. Use a 0 if you do not know: ")
     known = input("Enter the letters that you know in any order: ")
     not_in = input("Enter the letters that are not in in any order: ")
+    print(" ")
 
     known_place_list = []
     for x in known_place:
@@ -110,9 +109,9 @@ while True:
     for x in not_in:
         not_in_list.append(x)
 
-    BW = go(known_place_list,known_list,not_in_list, not_there)
+    BW = go(known_place_list,known_list,not_in_list, not_there,five_letter_words)
     done_words.append(BW)
-    print(BW)
+    print("THE BEST WORD TO USE IS: ",BW)
     lcv = 0
     for x in known_place_list:
         if x == 0:

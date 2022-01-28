@@ -67,6 +67,7 @@ def go(known_place,known,not_in, not_there, five_letter_words):
                     new_info(guess, pot_ans, temp_known_place, temp_known,temp_not_in)
                     temp_counter += possible_option_counter(temp_known_place, temp_known, five_letter_words,temp_not_in,not_there)
                     if temp_counter > best_word_score:
+                        temp_counter += 100000
                         break
             if temp_counter < best_word_score:
                 best_word_score = temp_counter

@@ -81,6 +81,7 @@ def go(known_place,known,not_in, not_there):
                 best_word_score = temp_counter
                 best_word = guess
                 print(best_word, best_word_score)
+    return best_word
 
 
 
@@ -115,5 +116,5 @@ while True:
                 not_there[lcv].append(y[lcv])
         lcv += 1
     print(not_there)
-    go(known_place_list,known_list,not_in_list, not_there)
-
+    BW = go(known_place_list,known_list,not_in_list, not_there)
+    done_words.append(BW)

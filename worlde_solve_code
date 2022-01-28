@@ -1,8 +1,6 @@
 from pickle import FALSE
 from english_words import english_words_lower_alpha_set
 import copy
-import json
-import time
 from tqdm import tqdm
 
 
@@ -60,14 +58,14 @@ def go(known_place,known,not_in, not_there, five_letter_words):
         if is_possible(guess, known_place, known,not_in, not_there):
             temp_counter = 0
             for pot_ans in tqdm(five_letter_words, desc="Checking \"{}\". Best score = {}. Best word = {}".format(guess,best_word_score, best_word)):
-                
-                temp_known_place = copy.deepcopy(known_place)
-                temp_known = copy.deepcopy(known)
-                temp_not_in = copy.deepcopy(not_in)
-                new_info(guess, pot_ans, temp_known_place, temp_known,temp_not_in)
-                temp_counter += possible_option_counter(temp_known_place, temp_known, five_letter_words,temp_not_in,not_there)
-                if temp_counter > best_word_score:
-                    break
+                if is_possible(pot_ans, known_place, known,not_in, not_there):
+                    temp_known_place = copy.deepcopy(known_place)
+                    temp_known = copy.deepcopy(known)
+                    temp_not_in = copy.deepcopy(not_in)
+                    new_info(guess, pot_ans, temp_known_place, temp_known,temp_not_in)
+                    temp_counter += possible_option_counter(temp_known_place, temp_known, five_letter_words,temp_not_in,not_there)
+                    if temp_counter > best_word_score:
+                        break
             if temp_counter < best_word_score:
                 best_word_score = temp_counter
                 best_word = guess

@@ -11,7 +11,7 @@ def num_of(a,word):
             total += 1
     return total
 
-def is_possible(guess, known_place, known, not_in):
+def is_possible(guess, known_place, known, not_in, not_there):
     done = []
     for x in range(0,5):
         if guess[x] != known_place[x] and known_place[x] != 0:
@@ -27,12 +27,16 @@ def is_possible(guess, known_place, known, not_in):
         if num == 2:
             if num_of(x,guess) < 2:
                 return False
+    
+    for x in range(0,5):
+        if guess[x] in not_there[x]:
+            return False
     return True
 
-def possible_option_counter(known_place, known, words, not_in):
+def possible_option_counter(known_place, known, words, not_in, not_there):
     counter = 0
     for x in words:
-        if is_possible(x, known_place, known, not_in):
+        if is_possible(x, known_place, known, not_in,not_there):
             counter += 1
     return counter
 
@@ -48,54 +52,68 @@ def new_info(guess, answer,known_place, known, not_in):
             not_in.append(guess[lcv])
         lcv += 1
 
-five_letter_words = []
 
-for x in english_words_lower_alpha_set:
-    if len(x) == 5:
-        five_letter_words.append(x)
+def go(known_place,known,not_in, not_there):
+    best_word = "BADBAD"
+    best_word_score = 10 **100
 
-bad = "alice ghent caine carib"
-bad = bad.split()
-for x in bad:
-    five_letter_words.remove(x)
-
-COPYfive_letter_words = copy.deepcopy(five_letter_words)
-
-
-d = json.load(open("text.txt"))
-
-
-
-
-best_word = "soare"
-best_word_score = 384012
-known_place = [0,0,0,0,0]
-known = []
-not_in = []
-
-#change best_word_score to 10*100
-#put the known letters in the right place in known_place. Keep the 0s if you don't know
-#put known letters in known
-#put letters not in it in the not_in
-
-print(d.keys())
-for guess in five_letter_words:
-    if guess not in d.keys():
-        if is_possible(guess, known_place, known,not_in):
+    five_letter_words = []
+    for x in english_words_lower_alpha_set:
+        if len(x) == 5:
+            five_letter_words.append(x)
+    bad = "alice ghent caine carib"
+    bad = bad.split()
+    for x in bad:
+        five_letter_words.remove(x)
+    COPYfive_letter_words = copy.deepcopy(five_letter_words)
+    for guess in five_letter_words:
+        if is_possible(guess, known_place, known,not_in, not_there):
             temp_counter = 0
             for pot_ans in COPYfive_letter_words:
                 temp_known_place = copy.deepcopy(known_place)
                 temp_known = copy.deepcopy(known)
                 temp_not_in = copy.deepcopy(not_in)
                 new_info(guess, pot_ans, temp_known_place, temp_known,temp_not_in)
-                temp_counter += possible_option_counter(temp_known_place, temp_known, five_letter_words,temp_not_in)
+                temp_counter += possible_option_counter(temp_known_place, temp_known, five_letter_words,temp_not_in,not_there)
+                if temp_counter > best_word_score:
+                    break
             if temp_counter < best_word_score:
                 best_word_score = temp_counter
                 best_word = guess
                 print(best_word, best_word_score)
 
-            d.update({guess:temp_counter})
-            d = dict(sorted(d.items(), key=lambda item: item[1]))
-            print(d)
-            print(" ")
-            json.dump(d, open("text.txt",'w'))
+
+
+print("Enter the word \"soare\"")
+done_words = ["soare"]
+not_there = [[],[],[],[],[]]
+while True:
+    print(" ")
+    known_place = input("Enter the letters that you know the place of. Use a 0 if you do not know: ")
+    known = input("Enter the letters that you know in any order: ")
+    not_in = input("Enter the letters that are not in in any order: ")
+
+    known_place_list = []
+    for x in known_place:
+        if x == "0":
+            known_place_list.append(0)
+        else:
+            known_place_list.append(x)
+
+    known_list = []
+    for x in known:
+        known_list.append(x)
+
+    not_in_list = []
+    for x in not_in:
+        not_in_list.append(x)
+
+    lcv = 0
+    for x in known_place_list:
+        if x == 0:
+            for y in done_words:
+                not_there[lcv].append(y[lcv])
+        lcv += 1
+    print(not_there)
+    go(known_place_list,known_list,not_in_list, not_there)
+

@@ -43,7 +43,10 @@ def new_info(guess, answer,known_place, known, not_in):
 
         if guess[lcv] == answer[lcv]:
             known_place[lcv] = guess[lcv]
-        if guess[lcv] in answer:
+        if guess[lcv] in answer and guess[lcv] not in known:
+            known.append(guess[lcv])
+        if num_of(guess[lcv], answer) == 2 and num_of(guess[lcv], guess) == 2:
+            known.append(guess[lcv])
             known.append(guess[lcv])
         if guess[lcv] not in answer:
             not_in.append(guess[lcv])
@@ -79,8 +82,8 @@ temp = f.readlines()
 f.close()
 five_letter_words = [word.strip() for word in temp]
 
-#print(is_possible("perky",[0,0,0,0,0],["e","r"],["s","a","o"],[[],[],[],[],[]]))
-
+#print(go([0,"e", "r",0,0],["e","r"],["s","a","o"],[["s","f"],[],[],[],[]],five_letter_words))
+#exit()
 print("starting")
 
 

@@ -15,23 +15,20 @@ def num_of(a,word):
 
 def is_possible(guess, known_place, known, not_in, not_there):
     for x in range(0,5):
+        if guess[x] in not_in:
+            return False
+        if guess[x] in not_there[x]:
+            return False
         if guess[x] != known_place[x] and known_place[x] != 0:
             return False
+        
     for x in known:
         if x not in guess:
             return False
-    for x in guess:
-        if x in not_in:
-            return False
-    for x in known:
         num = num_of(x, known)
         if num == 2:
             if num_of(x,guess) < 2:
                 return False
-    
-    for x in range(0,5):
-        if guess[x] in not_there[x]:
-            return False
     return True
 
 def possible_option_counter(known_place, known, words, not_in, not_there):
@@ -56,13 +53,13 @@ def new_info(guess, answer,known_place, known, not_in):
 
 def go(known_place,known,not_in, not_there, five_letter_words):
     best_word = "BADBAD"
-    best_word_score = 10 **100
+    best_word_score = 100000000000
 
     words_copy = copy.deepcopy(five_letter_words)
     for guess in (words_copy):
         if is_possible(guess, known_place, known,not_in, not_there):
             temp_counter = 0
-            for pot_ans in tqdm(five_letter_words, desc="Currently checking how good \"{}\" is".format(guess)):
+            for pot_ans in tqdm(five_letter_words, desc="Checking \"{}\". Best score = {}. Best word = {}".format(guess,best_word_score, best_word)):
                 
                 temp_known_place = copy.deepcopy(known_place)
                 temp_known = copy.deepcopy(known)

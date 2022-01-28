@@ -12,6 +12,13 @@ def num_of(a,word):
             total += 1
     return total
 
+def num_of_list(a, listz):
+    tot = 0
+    for x in listz:
+        if x == a:
+            tot += 1
+    return tot
+
 def is_possible(guess, known_place, known, not_in, not_there):
     for x in range(0,5):
         if guess[x] in not_in:
@@ -37,7 +44,7 @@ def possible_option_counter(known_place, known, words, not_in, not_there):
             counter += 1
     return counter
 
-def new_info(guess, answer,known_place, known, not_in):
+def new_info(guess, answer,known_place, known, not_in, temp_not_there):
     lcv = 0
     while lcv < 5:
 
@@ -46,8 +53,13 @@ def new_info(guess, answer,known_place, known, not_in):
         if guess[lcv] in answer and guess[lcv] not in known:
             known.append(guess[lcv])
         if num_of(guess[lcv], answer) == 2 and num_of(guess[lcv], guess) == 2:
-            known.append(guess[lcv])
-            known.append(guess[lcv])
+            num_known = num_of_list(guess[lcv], known)
+            if num_known == 0:
+               known.append(guess[lcv])
+               known.append(guess[lcv])
+            elif num_known == 1:
+                known.append(guess[lcv])
+             
         if guess[lcv] not in answer:
             not_in.append(guess[lcv])
         lcv += 1
@@ -67,7 +79,8 @@ def go(known_place,known,not_in, not_there, five_letter_words):
                     temp_known_place = copy.deepcopy(known_place)
                     temp_known = copy.deepcopy(known)
                     temp_not_in = copy.deepcopy(not_in)
-                    new_info(guess, pot_ans, temp_known_place, temp_known,temp_not_in)
+                    temp_not_there = copy.deepcopy(not_there)
+                    new_info(guess, pot_ans, temp_known_place, temp_known,temp_not_in, temp_not_there)
                     temp_counter += possible_option_counter(temp_known_place, temp_known, five_letter_words,temp_not_in,not_there)
                     if temp_counter > best_word_score:
                         temp_counter += 100000

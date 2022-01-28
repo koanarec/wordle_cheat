@@ -1,0 +1,101 @@
+from pickle import FALSE
+from english_words import english_words_lower_alpha_set
+import copy
+import json
+
+
+def num_of(a,word):
+    total = 0
+    for x in word:
+        if x == a:
+            total += 1
+    return total
+
+def is_possible(guess, known_place, known, not_in):
+    done = []
+    for x in range(0,5):
+        if guess[x] != known_place[x] and known_place[x] != 0:
+            return False
+    for x in known:
+        if x not in guess:
+            return False
+    for x in guess:
+        if x in not_in:
+            return False
+    for x in known:
+        num = num_of(x, known)
+        if num == 2:
+            if num_of(x,guess) < 2:
+                return False
+    return True
+
+def possible_option_counter(known_place, known, words, not_in):
+    counter = 0
+    for x in words:
+        if is_possible(x, known_place, known, not_in):
+            counter += 1
+    return counter
+
+def new_info(guess, answer,known_place, known, not_in):
+    lcv = 0
+    while lcv < 5:
+
+        if guess[lcv] == answer[lcv]:
+            known_place[lcv] = guess[lcv]
+        if guess[lcv] in answer:
+            known.append(guess[lcv])
+        if guess[lcv] not in answer:
+            not_in.append(guess[lcv])
+        lcv += 1
+
+five_letter_words = []
+
+for x in english_words_lower_alpha_set:
+    if len(x) == 5:
+        five_letter_words.append(x)
+
+bad = "alice ghent caine carib"
+bad = bad.split()
+for x in bad:
+    five_letter_words.remove(x)
+
+COPYfive_letter_words = copy.deepcopy(five_letter_words)
+
+
+d = json.load(open("text.txt"))
+
+
+
+
+best_word = "soare"
+best_word_score = 384012
+known_place = [0,0,0,0,0]
+known = []
+not_in = []
+
+#change best_word_score to 10*100
+#put the known letters in the right place in known_place. Keep the 0s if you don't know
+#put known letters in known
+#put letters not in it in the not_in
+
+print(d.keys())
+for guess in five_letter_words:
+    if guess not in d.keys():
+        if is_possible(guess, known_place, known,not_in):
+            temp_counter = 0
+            for pot_ans in COPYfive_letter_words:
+                temp_known_place = copy.deepcopy(known_place)
+                temp_known = copy.deepcopy(known)
+                temp_not_in = copy.deepcopy(not_in)
+                new_info(guess, pot_ans, temp_known_place, temp_known,temp_not_in)
+                temp_counter += possible_option_counter(temp_known_place, temp_known, five_letter_words,temp_not_in)
+            if temp_counter < best_word_score:
+                best_word_score = temp_counter
+                best_word = guess
+                print(best_word, best_word_score)
+
+            d.update({guess:temp_counter})
+            d = dict(sorted(d.items(), key=lambda item: item[1]))
+            print(d)
+            print(" ")
+            json.dump(d, open("text.txt",'w'))

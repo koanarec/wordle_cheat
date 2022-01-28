@@ -68,7 +68,7 @@ def go(known_place,known,not_in, not_there):
     for x in bad:
         five_letter_words.remove(x)
     COPYfive_letter_words = copy.deepcopy(five_letter_words)
-    for guess in five_letter_words:
+    for guess in tqdm(five_letter_words):
         if is_possible(guess, known_place, known,not_in, not_there):
             temp_counter = 0
             for pot_ans in COPYfive_letter_words:

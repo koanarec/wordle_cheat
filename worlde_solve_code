@@ -21,6 +21,7 @@ def num_of_list(a, listz):
 
 def is_possible(guess, known_place, known, not_in, not_there):
     for x in range(0,5):
+        
         if guess[x] in not_in:
             return False
         if guess[x] in not_there[x]:
@@ -64,7 +65,7 @@ def new_info(guess, answer,known_place, known, not_in, temp_not_there):
             not_in.append(guess[lcv])
         
         if known_place[lcv] == 0:
-            temp_not_there[lcv] = guess[lcv]
+            temp_not_there[lcv].append(guess[lcv])
         lcv += 1
 
 
@@ -76,7 +77,7 @@ def go(known_place,known,not_in, not_there, five_letter_words):
     words_copy = copy.deepcopy(five_letter_words)
     for guess in (words_copy):
         if is_possible(guess, known_place, known,not_in, not_there):
-            temp_counter = 0
+            temp_counter = []
             for pot_ans in tqdm(five_letter_words, desc="Checking \"{}\". Best score = {}. Best word = {}".format(guess,best_word_score, best_word)):
                 if is_possible(pot_ans, known_place, known,not_in, not_there):
                     temp_known_place = copy.deepcopy(known_place)
@@ -84,13 +85,11 @@ def go(known_place,known,not_in, not_there, five_letter_words):
                     temp_not_in = copy.deepcopy(not_in)
                     temp_not_there = copy.deepcopy(not_there)
                     new_info(guess, pot_ans, temp_known_place, temp_known,temp_not_in, temp_not_there)
-                    temp_counter += possible_option_counter(temp_known_place, temp_known, five_letter_words,temp_not_in,temp_not_there)
-                    if temp_counter > best_word_score:
-                        temp_counter += 100000
-                        break
-            if temp_counter < best_word_score:
-                best_word_score = temp_counter
+                    temp_counter.append(possible_option_counter(temp_known_place, temp_known, five_letter_words,temp_not_in,temp_not_there))
+            if max(temp_counter) < best_word_score:
+                best_word_score = max(temp_counter)
                 best_word = guess
+            #print(guess, temp_counter)
     return best_word
 
 f = open('wordlewords.txt','r')
@@ -99,7 +98,18 @@ f.close()
 five_letter_words = [word.strip() for word in temp]
 
 #print(go([0,"e", "r",0,0],["e","r"],["s","a","o"],[["s","f"],[],[],[],[]],five_letter_words))
+#a = [0,0,0,0,0]
+#b = []
+#c = []
+#d = [[],[],[],[],[]]
+#new_info("ipshe", "ismaf",a,b,c,d)
+#print(a,b,c,d)
+#print(possible_option_counter(["f",0,0,0,"y"], ["f","r"],five_letter_words, ["t","z"],[["s"],[],[],[],[]] ))
+
+#print(go([0,"e", "r",0,0],["e","r","p"],["s","a","o"],[["s","f"],[],[],[],[]],five_letter_words))
 #exit()
+
+
 print("starting")
 
 

@@ -1,11 +1,10 @@
 from pickle import FALSE
-from english_words import english_words_lower_alpha_set
 import copy
 from tqdm import tqdm
 import time
 import random
 
-
+#Simple function to count number of a specific letter in a word
 def num_of(a,word):
     total = 0
     for x in word:
@@ -13,6 +12,7 @@ def num_of(a,word):
             total += 1
     return total
 
+#Simple function to count number of a specific letter in a list
 def num_of_list(a, listz):
     tot = 0
     for x in listz:
@@ -20,16 +20,19 @@ def num_of_list(a, listz):
             tot += 1
     return tot
 
+#This function will calculate if a guess is possible to be the answer, given the constraints we allready know. It returns False if impossible, and True if possible
+#known_place is a list of the letters we know and their place. There is a 0 instead of a letter, if we don't know what is in that position. EG: [0,"e",0,0,0]
+#known is a list of the letters we do know, it includes those of known_place. It works with repeats. EG ["e","d","k"]
+#not_in is  a list of letters we know are not in the answer.
+#not_there is a list containing 5 lists. The first list shows what letters cannot be in the first letter of the answer. EG: [["a"],["r"],["i"],["s"],["e"]]
 def is_possible(guess, known_place, known, not_in, not_there):
     for x in range(0,5):
-        
         if guess[x] in not_in:
             return False
         if guess[x] in not_there[x]:
             return False
         if guess[x] != known_place[x] and known_place[x] != 0:
             return False
-        
     for x in known:
         if x not in guess:
             return False
@@ -39,6 +42,7 @@ def is_possible(guess, known_place, known, not_in, not_there):
                 return False
     return True
 
+#This function will return the number of words the answer COULD be, given a set of constraints. 
 def possible_option_counter(known_place, known, words, not_in, not_there):
     counter = 0
     for x in words:
@@ -46,10 +50,10 @@ def possible_option_counter(known_place, known, words, not_in, not_there):
             counter += 1
     return counter
 
+#Given a guess you make, and what the REAL answer is. This will update known_place, known, not_in, temp_not_there to reflect the extra information we gain.
 def new_info(guess, answer,known_place, known, not_in, temp_not_there):
     lcv = 0
     while lcv < 5:
-
         if guess[lcv] == answer[lcv]:
             known_place[lcv] = guess[lcv]
         if guess[lcv] in answer and guess[lcv] not in known:
@@ -61,10 +65,8 @@ def new_info(guess, answer,known_place, known, not_in, temp_not_there):
                known.append(guess[lcv])
             elif num_known == 1:
                 known.append(guess[lcv])
-             
         if guess[lcv] not in answer:
             not_in.append(guess[lcv])
-        
         if known_place[lcv] == 0:
             temp_not_there[lcv].append(guess[lcv])
         lcv += 1
@@ -92,7 +94,7 @@ def go(known_place,known,not_in, not_there, five_letter_words):
                     temp_counter.append(possible_option_counter(temp_known_place, temp_known, five_letter_words,temp_not_in,temp_not_there))
                     maxs = sum(temp_counter)
                     pots.set_description("{}={} BEST: {}={}".format(guess, maxs, best_word, round(best_word_score)))
-                    if maxs > best_word_score or (lcv == 500 and maxs > best_word_score *0.03855347366 * 1.3):
+                    if maxs > best_word_score or (lcv == 500 and maxs > best_word_score *0.21598272138 * 1.3):
                         maxs = 100000000
                         break
                 lcv += 1
@@ -104,25 +106,18 @@ def go(known_place,known,not_in, not_there, five_letter_words):
             #print(guess, temp_counter)
     return best_word
 
-f = open('wordlewords.txt','r')
+inputs = input("Enter A to use the list of answers for wordle (2000 words), Enter E for all words you can enter (10,000): ")
+if inputs == "E":
+    f = open('wordlewords.txt','r')
+else:
+    f = open('wordle_only_answers_list.txt','r')
 temp = f.readlines()
 f.close()
 five_letter_words = [word.strip() for word in temp]
 
-#print(go([0,"e", "r",0,0],["e","r"],["s","a","o"],[["s","f"],[],[],[],[]],five_letter_words))
-#a = [0,0,0,0,0]
-#b = []
-#c = []
-#d = [[],[],[],[],[]]
-#new_info("ipshe", "ismaf",a,b,c,d)
-#print(a,b,c,d)
-#print(possible_option_counter(["f",0,0,0,"y"], ["f","r"],five_letter_words, ["t","z"],[["s"],[],[],[],[]] ))
-
-#print(go([0,"e", "r",0,0],["e","r","p"],["s","a","o"],[["s","f"],[],[],[],[]],five_letter_words))
-#exit()
-
-
-print("starting")
+print("The best words to start with are:")
+print("alter, arise")
+print("")
 
 starts = input("Enter the word you want to start with: ")
 done_words = [starts]
@@ -130,7 +125,7 @@ not_there = [[],[],[],[],[]]
 known_place_list = [0,0,0,0,0]
 while True:
     
-    known_place = input("Enter the letters that you know the place of. Use a 0 if you do not know: ")
+    known_place = input("Enter the letters that you know the place of. Use a 0 inplace of unknown letters. EG: 0ea00: ")
     known = input("Enter the letters that you know in any order: ")
     not_in = input("Enter the letters that are not in in any order: ")
     print(" ")
@@ -162,10 +157,3 @@ while True:
     BW = go(known_place_list,known_list,not_in_list, not_there,five_letter_words)
     done_words.append(BW)
     print("THE BEST WORD TO USE IS: ",BW)
-    
-    
-
-    
-    
-    
-    

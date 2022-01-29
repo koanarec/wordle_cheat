@@ -3,6 +3,8 @@ from english_words import english_words_lower_alpha_set
 import copy
 from tqdm import tqdm
 import time
+import math
+import random
 
 
 def num_of(a,word):
@@ -78,7 +80,10 @@ def go(known_place,known,not_in, not_there, five_letter_words):
     for guess in (words_copy):
         if is_possible(guess, known_place, known,not_in, not_there):
             temp_counter = []
-            for pot_ans in tqdm(five_letter_words, desc="Checking \"{}\". Best score = {}. Best word = {}".format(guess,best_word_score, best_word)):
+            random.shuffle(five_letter_words)
+            pots = tqdm(five_letter_words)
+            lcv = 0
+            for pot_ans in pots:
                 if is_possible(pot_ans, known_place, known,not_in, not_there):
                     temp_known_place = copy.deepcopy(known_place)
                     temp_known = copy.deepcopy(known)
@@ -86,8 +91,16 @@ def go(known_place,known,not_in, not_there, five_letter_words):
                     temp_not_there = copy.deepcopy(not_there)
                     new_info(guess, pot_ans, temp_known_place, temp_known,temp_not_in, temp_not_there)
                     temp_counter.append(possible_option_counter(temp_known_place, temp_known, five_letter_words,temp_not_in,temp_not_there))
-            if max(temp_counter) < best_word_score:
-                best_word_score = max(temp_counter)
+                    maxs = sum(temp_counter)
+                    pots.set_description("{}={} BEST: {}={}".format(guess, maxs, best_word, round(best_word_score)))
+                    if maxs > best_word_score or (lcv == 500 and maxs > best_word_score *0.03855347366 * 1.3):
+                        maxs = 100000000
+                        break
+                lcv += 1
+
+            ave = sum(temp_counter)
+            if ave < best_word_score:
+                best_word_score = ave
                 best_word = guess
             #print(guess, temp_counter)
     return best_word
@@ -113,8 +126,8 @@ five_letter_words = [word.strip() for word in temp]
 print("starting")
 
 
-print("Enter the word \"soare\"")
-done_words = ["soare"]
+print("Enter the word \"raise\"")
+done_words = ["raise"]
 not_there = [[],[],[],[],[]]
 known_place_list = [0,0,0,0,0]
 while True:

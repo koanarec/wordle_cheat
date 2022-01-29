@@ -125,9 +125,8 @@ five_letter_words = [word.strip() for word in temp]
 
 print("starting")
 
-
-print("Enter the word \"raise\"")
-done_words = ["raise"]
+starts = input("Enter the word you want to start with: ")
+done_words = [starts]
 not_there = [[],[],[],[],[]]
 known_place_list = [0,0,0,0,0]
 while True:

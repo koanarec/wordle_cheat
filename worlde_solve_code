@@ -54,10 +54,16 @@ def possible_option_counter(known_place, known, words, not_in, not_there):
 def new_info(guess, answer,known_place, known, not_in, temp_not_there):
     lcv = 0
     while lcv < 5:
+
+        #If you guessed the right letter in the right place it updates the known_place
         if guess[lcv] == answer[lcv]:
             known_place[lcv] = guess[lcv]
+
+        #If you guessed the right letter in the wrong place it updates known. If it is not allready there
         if guess[lcv] in answer and guess[lcv] not in known:
             known.append(guess[lcv])
+        
+        #This fixes the repeating problem, and will make sure you get two letters in known, if you should.
         if num_of(guess[lcv], answer) == 2 and num_of(guess[lcv], guess) == 2:
             num_known = num_of_list(guess[lcv], known)
             if num_known == 0:
@@ -65,8 +71,12 @@ def new_info(guess, answer,known_place, known, not_in, temp_not_there):
                known.append(guess[lcv])
             elif num_known == 1:
                 known.append(guess[lcv])
+        
+        #Updates not_in for letters not in the real answer
         if guess[lcv] not in answer:
             not_in.append(guess[lcv])
+
+        #Updates not_there, if you enter a letter in a place and it is not green, you know that letter is not there
         if known_place[lcv] == 0:
             temp_not_there[lcv].append(guess[lcv])
         lcv += 1
@@ -75,8 +85,6 @@ def new_info(guess, answer,known_place, known, not_in, temp_not_there):
 def go(known_place,known,not_in, not_there, five_letter_words):
     best_word = "BADBAD"
     best_word_score = 100000000000
-
-
     words_copy = copy.deepcopy(five_letter_words)
     for guess in (words_copy):
         if is_possible(guess, known_place, known,not_in, not_there):
@@ -98,12 +106,10 @@ def go(known_place,known,not_in, not_there, five_letter_words):
                         maxs = 100000000
                         break
                 lcv += 1
-
             ave = sum(temp_counter)
             if ave < best_word_score:
                 best_word_score = ave
                 best_word = guess
-            #print(guess, temp_counter)
     return best_word
 
 inputs = input("Enter A to use the list of answers for wordle (2000 words), Enter E for all words you can enter (10,000): ")

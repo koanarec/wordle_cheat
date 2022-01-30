@@ -160,7 +160,7 @@ five_letter_words = [word.strip() for word in temp]
 
 #You can choose which word to start with
 print("(in order) The best words to start with are:")
-print("salet roate, raise, alter, arise, ")
+print("soare, raise, alter, arise, ")
 print("")
 starts = input("Enter the word you want to start with: ")
 done_words = [starts]

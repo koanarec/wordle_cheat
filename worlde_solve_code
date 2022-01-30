@@ -44,10 +44,10 @@ def is_possible(guess, known_place, known, not_in, not_there):
 
 #This function will return the number of words the answer COULD be, given a set of constraints. 
 def possible_option_counter(known_place, known, words, not_in, not_there):
-    counter = 0
+    counter = []
     for x in words:
         if is_possible(x, known_place, known, not_in,not_there):
-            counter += 1
+            counter.append(x)
     return counter
 
 #Given a guess you make, and what the REAL answer is. This will update known_place, known, not_in, temp_not_there to reflect the extra information we gain.
@@ -121,7 +121,9 @@ def go(known_place,known,not_in, not_there, five_letter_words):
 
                     #Given information we gain from a guess, there is still multiple answers it could be. This will find all of these, add them together and add it to 
                     #answers_still_possible. To get a perfect number, we need to go through every possible potential answer that exists. 
-                    answers_still_possible += possible_option_counter(temp_known_place, temp_known, five_letter_words,temp_not_in,temp_not_there)
+
+                    possible_options = possible_option_counter(temp_known_place, temp_known, five_letter_words,temp_not_in,temp_not_there)
+                    answers_still_possible = len(possible_options)
 
                     #Sets the description for the bar chart. It is dynamic
                     shuffled_words.set_description("{}={} BEST: {}={}".format(guess, answers_still_possible, best_word, round(best_word_score)))

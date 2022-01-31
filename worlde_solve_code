@@ -87,59 +87,25 @@ def new_info(guess, answer,known_place, known, not_in, temp_not_there):
 #and guess. An example of this would be guess=mould, real_answer = could. We learn it ends with ould, but is not mould. The potential answers are still could, would, hould so that gets a score of 3
 #We don't know the real answer, so it does this for every single possible answer. if it is could, 3, if the real answer is mould=0, real_answer= leave then we get like 400. (because we don't learn much)
 #For each possible answer we get a number. Then it adds all these numbers together to get a score for that specific guess. The lowest guess wins. And is the best answer. 
-def go(known_place,known,not_in, not_there, five_letter_words):
-
-    #Sets the best_word, and the best_word_score to something dumb. It should replace these first time with a real guess. 
-    best_word = "BADBAD"
-    best_word_score = 100000000000
-    words_copy = copy.deepcopy(five_letter_words)
-
-    #Here, we are looping through all of the guesses that you could make. It only will guess something if it could be the correct answer, with the information that we have. 
-    for guess in (words_copy):
-        if is_possible(guess, known_place, known,not_in, not_there):
-
-            #The answers_still_possible vairble is the most important one. It keeps track of all of the answers that are possible from each guess, and answer. 
-            answers_still_possible = 0
-            
-            #tqdm will just make the bar chart. The shuffle here, is for optimization so it won't have to calculate ALL of the potential answers,
-            #after 500 it can estimate how bad a guess is, and then exit the loop early
-            random.shuffle(five_letter_words) 
-            shuffled_words = tqdm(five_letter_words)
-            lcv = 0
-
-            #This loops through all of the words,  and enters the inner loop if the answer, is possible to be the answer. We do not care if the potential answer cannot be the answer
-            for potential_answer in shuffled_words:
-                if is_possible(potential_answer, known_place, known,not_in, not_there):
-
-                    #simply deepcopies these information we have available, so it can be updated with new_info. The information we have, will change based on the answer, so 
-                    #if they were not deep copied, changing the potential answer would ruin everything.
-                    temp_known_place = copy.deepcopy(known_place)
-                    temp_known = copy.deepcopy(known)
-                    temp_not_in = copy.deepcopy(not_in)
-                    temp_not_there = copy.deepcopy(not_there)
-                    new_info(guess, potential_answer, temp_known_place, temp_known,temp_not_in, temp_not_there)
-
-                    #Given information we gain from a guess, there is still multiple answers it could be. This will find all of these, add them together and add it to 
-                    #answers_still_possible. To get a perfect number, we need to go through every possible potential answer that exists. 
-
-                    possible_options = possible_option_counter(temp_known_place, temp_known, five_letter_words,temp_not_in,temp_not_there)
-                    answers_still_possible = len(possible_options)
-
-                    #Sets the description for the bar chart. It is dynamic
-                    shuffled_words.set_description("{}={} BEST: {}={}".format(guess, answers_still_possible, best_word, round(best_word_score)))
-
-                    #If answers_still_possible > the best one we have, we know it is a bad guess so we exit
-                    #If we estimate that its a bad guess after 500 different random answers its probably a bad guess so we give up.
-                    if answers_still_possible > best_word_score or (lcv == early_fin_check and answers_still_possible > best_word_score * (num_of_words/early_fin_check) * early_fin_confidence):
-                        answers_still_possible = 100000000
-                        break
-                lcv += 1
-            
-            #Here, we are updating the best_word_score if it is in fact the best word. The best word should have the least number of potential answers.
-            if answers_still_possible < best_word_score:
-                best_word_score = answers_still_possible
-                best_word = guess
-    return best_word
+def go(guess, known_place,known,not_in, not_there, five_letter_words, depth):
+    depth += 1
+    if depth == 6:
+        print("failed", guess, known_place,known, not_there)
+        return 40000
+    if len(possible_option_counter(known_place, known, five_letter_words,not_in, not_there)) < 2:
+        return 1
+    else:
+        total = 0
+        for pot_ans in five_letter_words:
+            if is_possible(pot_ans, known_place, known, not_in, not_there):
+                temp_known_place = copy.deepcopy(known_place)
+                temp_known = copy.deepcopy(known)
+                temp_not_in = copy.deepcopy(not_in)
+                temp_not_there = copy.deepcopy(not_there) 
+                new_info(guess, pot_ans, temp_known_place, temp_known, temp_not_in, temp_not_there)
+                for pot_guess in five_letter_words:
+                    total += go(pot_guess, temp_known_place,temp_known,temp_not_in, temp_not_there, five_letter_words,depth)
+    return total 
 
 #This vairable stores how many potential answers you need to see before it will try to exit early. Should be over 100. 
 early_fin_check = 500
@@ -149,7 +115,8 @@ early_fin_confidence = 1.3
 
 #You can choose which wordlist to use. They are both in text files
 #The num_of_words is used in the early finish
-inputs = input("Enter a to use the list of answers for wordle (2000 words), Enter e for all words you can enter (10,000): ")
+#inputs = input("Enter a to use the list of answers for wordle (2000 words), Enter e for all words you can enter (10,000): ")
+inputs = "a"
 if inputs == "E":
     f = open('wordlewords.txt','r')
     num_of_words = 2315
@@ -164,10 +131,12 @@ five_letter_words = [word.strip() for word in temp]
 print("(in order) The best words to start with are:")
 print("salet roate, raise, alter, arise, ")
 print("")
-starts = input("Enter the word you want to start with: ")
-done_words = [starts]
-not_there = [[],[],[],[],[]]
-known_place_list = [0,0,0,0,0]
+#starts = input("Enter the word you want to start with: ")
+done_words = ["salet"]
+not_there = [["r"],["o"],["a"],["e"],["e"]]
+known_place_list = [0,0,0,0,"t"]
+
+print(go("ranks", known_place_list,["t"],["r","o","a","e"], not_there,five_letter_words,0))
 
 while True:
     #Enters information we know
@@ -204,8 +173,8 @@ while True:
     print("not there", not_there)
     time.sleep(2)
 
-    #Finds the best word and tells you
-    BW = go(known_place_list,known_list,not_in_list, not_there,five_letter_words)
-    done_words.append(BW)
-    print("THE BEST WORD TO USE IS: ",BW)
+    for x in five_letter_words:
+        print(go(x, known_place_list,known_list,not_in_list, not_there,five_letter_words,0),x)
+        time.sleep(3)
+    print("THE BEST WORD TO USE IS: ")
     print("")
